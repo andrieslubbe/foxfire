@@ -7,10 +7,11 @@ love.window.setTitle("Fox Fire")
 
 require 'Player'
 require 'Pillar'
+require 'Moss'
 
 lighter = Lighter()
 
-gameWidth, gameHeight = 480, 270
+gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
 
 
@@ -38,10 +39,10 @@ function love.load()
 
   world = bf.newWorld(0, 0, false)
 
-  plant = player.new(gameWidth/2, gameHeight/2, 5)
+  plant = player.new(gameWidth/2, gameHeight/2, 8)
 
   for i = 1, 10 do
-    local rad = 6
+    local rad = 12
     local pos = randomPos(rad)
     table.insert(pillar, pillar.new(pos.x, pos.y, rad*2,rad*2))
   end
