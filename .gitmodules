@@ -1,0 +1,9 @@
+[submodule "libs/lighter"]
+	path = libs/lighter
+	url = https://github.com/speakk/lighter.git
+[submodule "libs/push"]
+	path = libs/push
+	url = https://github.com/Ulydev/push.git
+[submodule "libs/breezefield"]
+	path = libs/breezefield
+	url = https://github.com/HDictus/breezefield.git
