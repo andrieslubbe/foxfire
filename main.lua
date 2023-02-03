@@ -10,7 +10,7 @@ require 'Pillar'
 
 lighter = Lighter()
 
-gameWidth, gameHeight = 960, 540
+gameWidth, gameHeight = 480, 270
 screenWidth, screenHeight = 1920, 1080
 
 
@@ -38,10 +38,10 @@ function love.load()
 
   world = bf.newWorld(0, 0, false)
 
-  plant = player.new(gameWidth/2, gameHeight/2, 8)
+  plant = player.new(gameWidth/2, gameHeight/2, 5)
 
   for i = 1, 10 do
-    local rad = 8
+    local rad = 6
     local pos = randomPos(rad)
     table.insert(pillar, pillar.new(pos.x, pos.y, rad*2,rad*2))
   end
@@ -59,6 +59,9 @@ function love.load()
 
 -- addLight signature: (x,y,radius,r,g,b,a)
   --local light = lighter:addLight(lightX, lightY, 300, pal.yellow)
+  img_floor_night = love.graphics.newImage("assets/images/floor_night.png")
+  img_floor_night:setWrap("repeat", "repeat")
+  img_floor_night_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_floor_night:getWidth(), img_floor_night:getHeight())
 end
 
 function randomPos(rad)
@@ -76,29 +79,50 @@ end
 
 -- Call after your light positions have been updated
 function preDrawLights()
-  --push:start()
+  
   love.graphics.setCanvas({ lightCanvas, stencil = true})
-  love.graphics.clear(0.4,0.4,0.4) -- Global illumination level
-  self.lighter:drawLights()
+  love.graphics.clear(pal.purple) -- Global illumination level
+  push:start()
+  lighter:drawLights()
+  push:finish()
   love.graphics.setCanvas()
-  --push:finish()
+ -- push:finish()
 end
 
 -- Call after you have drawn your scene (but before UI)
 function drawLights()
  -- push:start()
-  love.graphics.setBlendMode("multiply", "premultiplied")
+  love.graphics.setBlendMode("multiply", "alphamultiply")
+  
   love.graphics.draw(lightCanvas)
   love.graphics.setBlendMode("alpha")
-  --push:finish()
+  --push:finish()=
 end
 
+--local function floorStencil()
+--  love.graphics.setColor(0.5,0.5,0.5)
+--  --love.graphics.setBlendMode("multiply", "alphamultiply")
+--  lighter:drawLights()
+--end
+
 function love.draw()
-  --push:start()
+  --preDrawLights()
+  
+  --preDrawLights()
+  push:start()
+  --love.graphics.setStencilTest("greater",0)
+  --love.graphics.stencil(floorStencil, "replace", 1)
+  --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
+  --love.graphics.setStencilTest()
+ --love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  --love.graphics.draw(img_floor_night,img_floor_night, 0,0)
+  --preDrawLights()
+  --love.graphics.clear(pal.purple)
   
   --love.graphics.circle('fill', gameWidth/2, gameHeight/2, 12)
-  lighter:drawLights()
   world:draw()
-  --push:finish()
-
+  lighter:drawLights()
+  plant.draw()
+  push:finish()
+  
 end

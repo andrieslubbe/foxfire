@@ -30,8 +30,8 @@ function pillar.new(x, y, width, height)
 
 
   function physics:draw()
-    love.graphics.setColor(unpack(pal.blue))
-    love.graphics.polygon('fill', wall)
+    --love.graphics.setColor(unpack(pal.blue))
+    --love.graphics.polygon('fill', wall)
   end
 
   return self

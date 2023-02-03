@@ -5,7 +5,7 @@ function player.new(x, y, r)
   self.__index = self
   
   local speed = 1000
-  local light = lighter:addLight(x, y, r*100, pal.yellow)
+  local light = lighter:addLight(x, y, r*70, pal.bteal)
 
   local physics = bf.Collider.new(world, 'Circle', x, y, r)
   physics:setLinearDamping(1.8)
@@ -56,6 +56,9 @@ function player.new(x, y, r)
   end
 
   function physics:draw()
+  end
+
+  function self.draw()
     love.graphics.setColor(unpack(pal.yellow))
     love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
   end
