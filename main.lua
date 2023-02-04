@@ -2,6 +2,7 @@ push = require "libs/push/push"
 bf = require "libs/breezefield"
 --wf = require "libs/windfield/windfield"
 Lighter = require "libs/lighter"
+anim8 = require("libs/anim8/anim8")
 
 
 love.window.setTitle("Fox Fire")
@@ -17,10 +18,12 @@ lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
 
 local font = love.graphics.newFont(16)
+local fontS = love.graphics.newFont(10)
 gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
 
-
+local sprites, animation
+local score
 
 pal = {
   green = {0.373,	1.000,	0.051},
@@ -54,6 +57,7 @@ function distAngle(x1, y1, x2, y2)
 end
 
 function love.load()
+  score = 0
   sounds = {}
   sounds.light = love.audio.newSource("assets/sounds/light.mp3", "static")
   sounds.music = love.audio.newSource("assets/sounds/music.mp3", "static")
@@ -62,6 +66,10 @@ function love.load()
   sounds.music:setLooping(true)
   sounds.light:setLooping(true)
   sounds.music:play()
+
+  --sprite = love.graphics.newImage("assets/images/flower-Sheet.png")
+  --local g = anim8.newGrid(32,32, sprite:getWidth(), sprite:getHeight())
+  --animation = anim8.newAnimation(g('1-5',1), 0.1, 'pauseAtEnd')
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
   push:setupScreen(gameWidth, gameHeight, screenWidth, screenHeight, {
@@ -138,7 +146,8 @@ function explode(x, y, col)
 end
 
 function love.update(dt)
-  joysticks = love.joystick.getJoysticks()
+  --animation:update(dt)
+  --joysticks = love.joystick.getJoysticks()
   world:update(dt)
   plant.update(dt)
   for i=#enemy,1,-1 do
@@ -149,7 +158,7 @@ function love.update(dt)
       table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()))
       en.destroy()
       table.remove(enemy, i)
-      
+      score = score + 1
     end
   end
   timerenemy = timerenemy - dt
@@ -311,9 +320,7 @@ function love.draw()
   for i, p in ipairs(blood) do
     p.draw()
   end
-  for i, p in ipairs(particles) do
-    p.draw()
-  end
+ 
   
   --love.graphics.stencil(pillarStencil, "replace", 1, false)
   --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
@@ -321,15 +328,23 @@ function love.draw()
   lighter:drawLights()
   --love.graphics.setStencilTest()
   world:draw()
-  love.graphics.setFont(font)
+  for i, p in ipairs(particles) do
+    p.draw()
+  end
+  
   local ammo = ''
   for i=1,plant.getSpores() do
     ammo = ammo .. '•'
   end
+  love.graphics.setFont(font)
+  love.graphics.setColor(pal.white)
   love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
+  --love.graphics.setFont(fontS)
+  love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
+
 
  -- love.graphics.printf(love.timer.getFPS( ),0,gameHeight/3, gameWidth,'center')
-  
+  --animation:draw(sprite, plant:getX()-plant:getRadius(),plant:getY()-plant:getRadius())
   push:finish()
   
 end

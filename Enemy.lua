@@ -6,7 +6,7 @@ function enemy.new(x, y)
   
   local width = 8
   local height = 8
-  local pow = 20
+  local pow = 30
   local dead = false
   local lit = 0
   local trap = 0
@@ -19,7 +19,7 @@ function enemy.new(x, y)
   --local poly = lighter:addPolygon(wall)
 
   local physics = bf.Collider.new(world, 'Rectangle', x, y, width, height)
-  physics:setLinearDamping(1.8)
+  physics:setLinearDamping(1)
 
   function self.getX()
     return physics.getX()

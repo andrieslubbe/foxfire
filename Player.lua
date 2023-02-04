@@ -185,6 +185,7 @@ function player.new(x, y, r)
     --love.graphics.setColor(unpack(pal.yellow))
     --love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
     --lighter:drawVisibilityPolygon(light)
+    
   end
 
   return self

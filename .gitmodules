@@ -7,3 +7,6 @@
 [submodule "libs/breezefield"]
 	path = libs/breezefield
 	url = https://github.com/HDictus/breezefield.git
+[submodule "libs/anim8"]
+	path = libs/anim8
+	url = https://github.com/kikito/anim8.git
