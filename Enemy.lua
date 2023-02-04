@@ -67,8 +67,10 @@ function enemy.new(x, y)
       --love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
-    end
+    love.graphics.setColor(pal.red)
     love.graphics.rectangle(style, self:getX(),self:getY(),width,height)
+    end
+    
     
   end
 

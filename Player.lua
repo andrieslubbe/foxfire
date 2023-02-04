@@ -4,14 +4,18 @@ function player.new(x, y, r)
   local self = {}
   self.__index = self
   
-  local speed = 1400
+  local speed = 2400
   local lightrad = 1
-  local light = lighter:addLight(x, y, r, pal.bteal)
+  local light = lighter:addLight(x, y, r, pal.teal)
   local lightgrow = 20
   local maxLight = 40
   local stopped = false
   local spawnFreq = .3
   local spawnTimer = spawnFreq
+  local spores = 0
+  local sporesmax = 10
+  local freqspores = 0.1
+  local timerspores = freqspores
 
   local physics = bf.Collider.new(world, 'Circle', x, y, r)
   --local physics = world:newRectangleCollider(x,y,r/2,height)
@@ -27,9 +31,16 @@ function player.new(x, y, r)
   function self.getRadius()
     return physics.getRadius()
   end
+  function self.getLight()
+    return lightrad
+  end
   function self.isStopped()
     return stopped
   end
+  function self.getSpores()
+    return spores
+  end
+
 
   function love.keypressed(key)
     if key == "space" then
@@ -46,7 +57,13 @@ function player.new(x, y, r)
     if lightrad < maxLight then
       lightrad = lightrad + dt * lightgrow
     end
-
+    timerspores = timerspores - dt
+    if timerspores < 0 then
+      timerspores = freqspores
+      if spores < sporesmax then 
+        spores = spores + 1
+      end
+    end
     --for i=#moss,1,-1 do
     --  dried = moss[i]
     --  local dist = distanceBetween(dried.getX(), dried.getY(), self:getX(), self:getY())
@@ -60,8 +77,11 @@ function player.new(x, y, r)
   function self.moving(dt)
     spawnTimer = spawnTimer - dt
     if spawnTimer <= 0 then
-      spawnTimer = spawnFreq
-      table.insert(moss, moss.new(self:getX(), self:getY()))
+      if spores > 0 then 
+        spawnTimer = spawnFreq
+        table.insert(moss, moss.new(self:getX(), self:getY()))
+        spores = spores - 1
+      end
     end
     physics:setLinearDamping(1.8)
     lightrad = 1
@@ -76,7 +96,7 @@ function player.new(x, y, r)
     for i=#enemy,1,-1 do
       en = enemy[i]
       local dist = distanceBetween(en.getX(), en.getY(), self:getX(), self:getY())
-      if dist < self:getRadius() * lightrad then
+      if dist <  lightrad / 2.5 * self:getRadius() then
           en.lit()
         
       end
@@ -85,7 +105,7 @@ function player.new(x, y, r)
     for i=#moss,1,-1 do
       dried = moss[i]
       local dist = distanceBetween(dried.getX(), dried.getY(), self:getX(), self:getY())
-      if dist < self:getRadius() * lightrad then
+      if dist < lightrad / 2.5 * self:getRadius() then
         local fact = lightrad / dist
         if fact > 0.7 then
           fact = 0.7
@@ -109,41 +129,39 @@ function player.new(x, y, r)
       sounds.light:stop()
     end
     
-    lighter:updateLight(light, self:getX(), self:getY(), self.getRadius() * 2 * lightrad)
+    lighter:updateLight(light, self:getX(), self:getY(), lightrad * self:getRadius())
     local moveAngles = {}
   
-    if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
-      table.insert(moveAngles, math.pi * 1.5)
-      if love.keyboard.isDown("s") or love.keyboard.isDown("right") then
-        table.insert(moveAngles,math.pi*2)
+   
+      if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
+        table.insert(moveAngles, math.pi * 1.5)
+        if love.keyboard.isDown("s") or love.keyboard.isDown("right") then
+          table.insert(moveAngles,math.pi*2)
+        end
+      elseif love.keyboard.isDown("s") or love.keyboard.isDown("right") then
+        table.insert(moveAngles,0)
       end
-    elseif love.keyboard.isDown("s") or love.keyboard.isDown("right") then
-      table.insert(moveAngles,0)
-    end
-    if love.keyboard.isDown("r") or love.keyboard.isDown("down") then
-      table.insert(moveAngles,math.pi / 2)
-    end
-    if love.keyboard.isDown("a")  or love.keyboard.isDown("left") then
-      table.insert(moveAngles, math.pi)
-    end
-    --print(#moveAngles)
-    
-    
-    
-
-    if #moveAngles > 0 then
-      stopped = false
-      local sum = 0
-      for _,v in pairs(moveAngles) do -- Get the sum of all numbers in t
-        sum = sum + v
+      if love.keyboard.isDown("r") or love.keyboard.isDown("down") then
+        table.insert(moveAngles,math.pi / 2)
       end
-      local moveAngle = sum / #moveAngles
-      --moveAngle = moveAngle % (2 * math.pi)
-      local xbounce = math.cos(moveAngle) * speed * dt
-      local ybounce = math.sin(moveAngle) * speed * dt
-      physics:applyForce(xbounce,ybounce)
-    end
-  
+      if love.keyboard.isDown("a")  or love.keyboard.isDown("left") then
+        table.insert(moveAngles, math.pi)
+      end
+      --print(#moveAngles)
+      
+      if #moveAngles > 0 then
+        stopped = false
+        local sum = 0
+        for _,v in pairs(moveAngles) do -- Get the sum of all numbers in t
+          sum = sum + v
+        end
+        local moveAngle = sum / #moveAngles
+        --moveAngle = moveAngle % (2 * math.pi)
+        local xbounce = math.cos(moveAngle) * speed * dt
+        local ybounce = math.sin(moveAngle) * speed * dt
+        physics:applyForce(xbounce,ybounce)
+      end
+    
     --print(physics:getLinearVelocity())
 
   
@@ -155,6 +173,7 @@ function player.new(x, y, r)
   function self.draw()
     --love.graphics.setColor(unpack(pal.yellow))
     --love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
+    --lighter:drawVisibilityPolygon(light)
   end
 
   return self

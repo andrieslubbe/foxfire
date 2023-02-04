@@ -14,7 +14,7 @@ require 'Enemy'
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
 
-
+local font = love.graphics.newFont(28)
 gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
 
@@ -73,7 +73,7 @@ function love.load()
 
   plant = player.new(gameWidth/2, gameHeight/2, 8)
 
-  for i = 1, 10 do
+  for i = 1, 20 do
     local rad = 12
     local pos = randomPos(rad)
     table.insert(pillar, pillar.new(pos.x, pos.y, rad*2,rad*2))
@@ -120,6 +120,7 @@ end
 --end
 
 function love.update(dt)
+  
   world:update(dt)
   plant.update(dt)
   for i=#enemy,1,-1 do
@@ -165,6 +166,14 @@ local function shadowStencil()
   --love.graphics.setColor(0,0,0)
 
   lighter:drawLights()
+  --love.graphics.setColor(1,1,1)
+  --push:start()
+  --love.graphics.circle('fill', plant:getX(), plant:getY(), plant:getLight())
+  --push:finish()
+end
+local function playerStencil()
+  love.graphics.setColor(0,0,0)
+  love.graphics.circle('fill', plant:getX(), plant:getY(), plant:getLight() * plant.getRadius()/20)
 end
 
 function love.draw()
@@ -177,7 +186,7 @@ function love.draw()
   --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
   --love.graphics.seartStencilTest()
     
-  --love.graphics.draw(img_floor_night,img_floor_night, 0,0)
+  love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
   --preDrawLights()
   --love.graphics.clear(pal.purple)
   
@@ -186,9 +195,10 @@ function love.draw()
   
   --love.graphics.clear(pal.purple)
   
- 
-  love.graphics.stencil(shadowStencil, "replace", 1, true)
-  love.graphics.setStencilTest("greater", 0)
+  --love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  --love.graphics.stencil(shadowStencil, "replace", 0, true)
+  --love.graphics.stencil(playerStencil, "replace", 255, true)
+  --love.graphics.setStencilTest("greater", 0)
   --love.graphics.clear(pal.white)
   --love.graphics.setStencilTest()
   for i, p in ipairs(moss) do
@@ -196,16 +206,19 @@ function love.draw()
   end
   --love.graphics.clear(pal.yellow)
   --love.graphics.setStencilTest()
-  world:draw()
   
-  --love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  
+  --
   plant.draw()
-  
-  
   for i, p in ipairs(enemy) do
     p.draw()
   end
   lighter:drawLights()
+  love.graphics.setStencilTest()
+  world:draw()
+  love.graphics.setFont(font)
+  love.graphics.printf(plant.getSpores(), 0, gameHeight/16, gameWidth, 'center')
+  
   push:finish()
   
 end
