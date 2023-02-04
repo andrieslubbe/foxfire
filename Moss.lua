@@ -5,15 +5,17 @@ function moss.new(x, y)
   self.__index = self
 
   --local rad= 4
-  local growrate = 0.02
-  local decay = .8
+  local growrate = 0.1
+  local decay = 1
+  local lightscale = 10
   local x = x
   local y = y
-  --local light = lighter:addLight(x, y, rad, pal.yellow)
+  
   local life = 0.01
   local dead = false
   local lit = 0
   local energy = 3
+  local light = lighter:addLight(x, y, life, pal.bteal)
 
   --local physics = bf.Collider.new(world, 'Circle', x, y, 4)
   function self.getX()
@@ -37,6 +39,9 @@ function moss.new(x, y)
     lit = fact
     --print(lit)
   end
+  function self.hit()
+    life = life -1
+  end
 
   function self.update(dt)
     
@@ -44,11 +49,11 @@ function moss.new(x, y)
       dead = true
     end
     if lit>0 then -- update energy
-      energy = energy + lit*dt
+      energy = energy + lit*dt *lightscale
       lit = 0
       --rad = rad + dt*growrate
       --life = life + dt*growrate
-      --lighter:updateLight(light, nil, nil, rad)
+      
     end
     if energy > 0 then
       if energy > growrate then -- excess energy
@@ -67,16 +72,21 @@ function moss.new(x, y)
 
     for i, p in ipairs(enemy) do
       local dist = distanceBetween(p.getX(), p.getY(), self:getX(), self:getY())
+      if dist < life   then
+        p.lit()
+      end
       if dist < self:getRadius() + p.getRadius() then
-        p.kill()
+        --p.kill()
+        --self:hit()
       end
     end
+    lighter:updateLight(light, nil, nil, life*2.5)
 
   end
 
   function self.draw()
-    love.graphics.setColor(pal.yellow)
-    love.graphics.circle('fill', x, y, life)
+    love.graphics.setColor(1,1,1, 0.1)
+    love.graphics.circle('line', x, y, life)
   end
 
   return self
