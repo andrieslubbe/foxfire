@@ -10,6 +10,8 @@ require 'Player'
 require 'Pillar'
 require 'Moss'
 require 'Enemy'
+require 'Blood'
+require 'Particles'
 
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
@@ -17,6 +19,7 @@ lighter = Lighter()
 local font = love.graphics.newFont(16)
 gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
+
 
 
 pal = {
@@ -33,9 +36,7 @@ pal = {
   black =   {0.208, 0.165, 0.333}
 }
 
-local shader_code = [[
 
-]]
 
 function distanceBetween(x1, y1, x2, y2)
   return math.sqrt((x2 - x1)^2 + (y2 - y1)^2)
@@ -88,7 +89,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 4
+  freqenemy = 1
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 
@@ -123,17 +124,32 @@ end
 --    table.insert(enemy, enemy.new(love.math.random(9, gameWidth-9), 9)) --top
 --  end
 --end
+function explode(x, y, col)
+  --for i=1,12 do
+  --  table.insert(particles, particles.new(
+  --    x,y, 1,
+  --    col,math.random(6,8)/20,-math.random(6,8)/20,math.random()*2*math.pi,math.random(28,44)))
+  --end
+  for i=1,5 do
+    table.insert(particles, particles.new(
+      x,y,4,
+      'red',2,1.1,math.random()*2*math.pi,math.random(7,12)))
+  end
+end
 
 function love.update(dt)
-  
+  joysticks = love.joystick.getJoysticks()
   world:update(dt)
   plant.update(dt)
   for i=#enemy,1,-1 do
     en = enemy[i]
     en.update(dt)
     if en.isDead() then
+      explode(en.getX()+en.getRadius()/2, en.getY()+en.getRadius()/2, 'pink')
+      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()))
       en.destroy()
       table.remove(enemy, i)
+      
     end
   end
   timerenemy = timerenemy - dt
@@ -142,6 +158,23 @@ function love.update(dt)
       timerenemy = freqenemy
       local pos = randomPos(4)
       table.insert(enemy, enemy.new(pos.x, pos.y))
+    end
+  end
+  for i=#blood,1,-1 do
+    bl = blood[i]
+    bl.update(dt)
+    if bl.isDead() then 
+      
+      table.remove(blood,i)
+    end
+  end
+
+  for p=#particles,1,-1 do
+    local particle = particles[p]
+    if particle.isDead() == true then
+      table.remove(particles, p)
+    else
+      particle.update(dt)
     end
   end
 
@@ -236,9 +269,12 @@ function love.draw()
   --love.graphics.setStencilTest("greater", 0)
   --love.graphics.clear(pal.white)
   --love.graphics.setStencilTest()
+  
   for i, p in ipairs(moss) do
     p.draw()
   end
+  
+ 
   --love.graphics.clear(pal.purple)
   --love.graphics.setStencilTest()
   
@@ -248,6 +284,7 @@ function love.draw()
   for i, p in ipairs(enemy) do
     p.draw()
   end
+  
 
   love.graphics.stencil(shroomStencil, "replace", 1)
   love.graphics.stencil(pillarStencil, "replace",0,true)
@@ -271,6 +308,12 @@ function love.draw()
   --love.graphics.stencil(shadowStencil, "replace",1,false)
   --love.graphics.clear(pal.purple)
   love.graphics.setStencilTest()
+  for i, p in ipairs(blood) do
+    p.draw()
+  end
+  for i, p in ipairs(particles) do
+    p.draw()
+  end
   
   --love.graphics.stencil(pillarStencil, "replace", 1, false)
   --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
@@ -284,6 +327,8 @@ function love.draw()
     ammo = ammo .. '•'
   end
   love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
+
+ -- love.graphics.printf(love.timer.getFPS( ),0,gameHeight/3, gameWidth,'center')
   
   push:finish()
   

@@ -12,6 +12,7 @@ function moss.new(x, y)
   local y = y
   
   local life = 0.01
+  local lifemax = 40
   local dead = false
   local lit = 0
   local energy = 3
@@ -40,7 +41,7 @@ function moss.new(x, y)
     --print(lit)
   end
   function self.hit()
-    life = life -1
+    life = life -3
   end
 
   function self.update(dt)
@@ -55,7 +56,7 @@ function moss.new(x, y)
       --life = life + dt*growrate
       
     end
-    if energy > 0 then
+    if energy > 0 and life < lifemax then
       if energy > growrate then -- excess energy
         energy = energy - growrate
         life = life + growrate
@@ -69,18 +70,27 @@ function moss.new(x, y)
     else
       life = life - dt * decay
     end
+    
 
     for i, p in ipairs(enemy) do
       local dist = distanceBetween(p.getX(), p.getY(), self:getX(), self:getY())
       if dist < life   then
         p.lit()
+        p.trap()
       end
       if dist < self:getRadius() + p.getRadius() then
         --p.kill()
         --self:hit()
       end
     end
-    lighter:updateLight(light, nil, nil, life*2.8)
+    for i, p in ipairs(blood) do
+      local dist = distanceBetween(p.getX(), p.getY(), self:getX(), self:getY())
+      if dist < life + p.getRadius() then
+        self:hit()
+        p.hit()
+      end
+    end
+    lighter:updateLight(light, nil, nil, life*2)
 
   end
 

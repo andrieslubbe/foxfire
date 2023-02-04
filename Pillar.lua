@@ -35,6 +35,7 @@ function pillar.new(x, y, width, height)
   function physics:draw()
     --love.graphics.setColor(0,0,0,0)
     --love.graphics.polygon('fill', wall)
+    
   end
 
   return self

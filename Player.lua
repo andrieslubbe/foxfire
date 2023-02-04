@@ -5,7 +5,8 @@ function player.new(x, y, r)
   self.__index = self
   
   local speed = 2400
-  local lightrad = 1
+  local lightradmin = 3
+  local lightrad = lightradmin
   local light = lighter:addLight(x, y, r, pal.teal)
   local lightgrow = 20
   local maxLight = 40
@@ -20,6 +21,7 @@ function player.new(x, y, r)
   local physics = bf.Collider.new(world, 'Circle', x, y, r)
   --local physics = world:newRectangleCollider(x,y,r/2,height)
   physics:setLinearDamping(1.8)
+  physics.identity = "player"
   --setmetatable(self, physics)
 
   function self.getX()
@@ -42,15 +44,15 @@ function player.new(x, y, r)
   end
 
 
-  function love.keypressed(key)
-    if key == "space" then
-      sounds.roots:play()
-      sounds.light:play()
-      --physics:setLinearVelocity(0,0)
-      stopped = true
-      --light = lighter:addLight(x, y, r*70, pal.bteal)
-    end
-  end
+  --function love.keypressed(key)
+  --  if key == "space" then
+  --    sounds.roots:play()
+  --    sounds.light:play()
+  --    --physics:setLinearVelocity(0,0)
+  --    stopped = true
+  --    --light = lighter:addLight(x, y, r*70, pal.bteal)
+  --  end
+  --end
 
   function self.still(dt)
     physics:setLinearDamping(10)
@@ -84,8 +86,11 @@ function player.new(x, y, r)
       end
     end
     physics:setLinearDamping(1.8)
-    if lightrad > 1 then 
+    if lightrad > lightradmin then 
       lightrad = lightrad - dt * lightgrow*5
+      if lightrad < lightradmin then
+        lightrad = lightradmin
+      end
     end
   end
   
@@ -128,7 +133,7 @@ function player.new(x, y, r)
       
     else
       self.moving(dt)
-      sounds.light:stop()
+      --sounds.light:stop()
     end
     
     lighter:updateLight(light, self:getX(), self:getY(), lightrad * self:getRadius())
@@ -162,6 +167,8 @@ function player.new(x, y, r)
         local xbounce = math.cos(moveAngle) * speed * dt
         local ybounce = math.sin(moveAngle) * speed * dt
         physics:applyForce(xbounce,ybounce)
+      else 
+        stopped = true
       end
     
     --print(physics:getLinearVelocity())
@@ -170,6 +177,8 @@ function player.new(x, y, r)
   end
 
   function physics:draw()
+    love.graphics.setColor(1,1,1, 0.1)
+    love.graphics.circle('fill',self:getX(), self.getY(),self:getRadius())
   end
 
   function self.draw()

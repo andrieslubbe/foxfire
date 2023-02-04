@@ -4,11 +4,12 @@ function enemy.new(x, y)
   local self = {}
   self.__index = self
   
-  local width = 4
-  local height = 4
+  local width = 8
+  local height = 8
   local pow = 20
   local dead = false
   local lit = 0
+  local trap = 0
   --local wall = {
   --  x-width/2,y-height/2,
   --  x+width/2,y-height/2,
@@ -41,6 +42,9 @@ function enemy.new(x, y)
   function self.lit()
     lit = 1
   end
+  function self.trap()
+    trap = 1
+  end
 
   function self.update(dt)
     if lit == 0  then
@@ -57,18 +61,29 @@ function enemy.new(x, y)
         lit = 0
       end
     end
+
+    if trap > 0 then
+      trap = trap - dt
+      if trap < 0 then
+        trap = 0
+      end
+    end 
   end
 
   function physics:draw(alpha)
-    local style = 'line'
+    local col = pal.red
+    if trap>0 then
+      col = pal.white
+    end
+    love.graphics.setColor(col)
     if lit>0 then
-      style = 'fill'
+      --style = 'fill'
       --love.graphics.setColor(unpack(pal.white))
       --love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
-    love.graphics.setColor(pal.red)
-    love.graphics.rectangle(style, self:getX(),self:getY(),width,height)
+     
+      love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     end
     
     
@@ -76,10 +91,11 @@ function enemy.new(x, y)
 
   function physics:postSolve(other)
     if other.identity == 'player' then
-      if self.lit > 0 then
-        self.kill()
+      if trap > 0 then
+        --self:kill()
+        dead = true
       else
-        
+        --TODO: damage player
       end
     --  --print("collect")
     --  chain = chain + 1
