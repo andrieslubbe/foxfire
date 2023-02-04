@@ -7,9 +7,14 @@ function player.new(x, y, r)
   local speed = 1400
   local lightrad = 1
   local light = lighter:addLight(x, y, r, pal.bteal)
-  local isStopped = false
+  local lightgrow = 20
+  local maxLight = 40
+  local stopped = false
+  local spawnFreq = .3
+  local spawnTimer = spawnFreq
 
   local physics = bf.Collider.new(world, 'Circle', x, y, r)
+  --local physics = world:newRectangleCollider(x,y,r/2,height)
   physics:setLinearDamping(1.8)
   --setmetatable(self, physics)
 
@@ -22,25 +27,81 @@ function player.new(x, y, r)
   function self.getRadius()
     return physics.getRadius()
   end
+  function self.isStopped()
+    return stopped
+  end
 
   function love.keypressed(key)
     if key == "space" then
       --physics:setLinearVelocity(0,0)
-      isStopped = true
+      stopped = true
       --light = lighter:addLight(x, y, r*70, pal.bteal)
     end
+  end
+
+  function self.still(dt)
+    physics:setLinearDamping(10)
+    if lightrad < maxLight then
+      lightrad = lightrad + dt * lightgrow
+    end
+
+    --for i=#moss,1,-1 do
+    --  dried = moss[i]
+    --  local dist = distanceBetween(dried.getX(), dried.getY(), self:getX(), self:getY())
+    --  if dist < self:getRadius() * lightrad then
+    --    local fact = dist / lightrad^2
+    --    dried.lit(fact)
+    --  end
+    --end
+  end
+
+  function self.moving(dt)
+    spawnTimer = spawnTimer - dt
+    if spawnTimer <= 0 then
+      spawnTimer = spawnFreq
+      table.insert(moss, moss.new(self:getX(), self:getY()))
+    end
+    physics:setLinearDamping(1.8)
+    lightrad = 1
   end
  
 
   function self.update(dt)
-    if isStopped == true then
-      physics:setLinearDamping(10)
-      if lightrad < 80 then
-        lightrad = lightrad + 0.01/dt
+    --for i, p in ipairs(moss) do
+    --  p.update(dt)
+    --end
+    for i=#enemy,1,-1 do
+      en = enemy[i]
+      local dist = distanceBetween(en.getX(), en.getY(), self:getX(), self:getY())
+      if dist < self:getRadius() * lightrad then
+          en.lit()
+        
       end
+    end
+
+    for i=#moss,1,-1 do
+      dried = moss[i]
+      local dist = distanceBetween(dried.getX(), dried.getY(), self:getX(), self:getY())
+      if dist < self:getRadius() * lightrad then
+        local fact = lightrad / dist
+        if fact > 0.7 then
+          fact = 0.7
+        end
+          dried.lit(fact)
+        
+      end
+      dried.update(dt)
+      if dried.isDead() then
+        table.remove(moss, i)
+        dried.destroy()
+      end
+    end
+
+
+    if stopped == true then
+      self.still(dt)
     else
-      physics:setLinearDamping(1.8)
-      lightrad = 1
+      self.moving(dt)
     end
     
     lighter:updateLight(light, self:getX(), self:getY(), self.getRadius() * 2 * lightrad)
@@ -63,7 +124,7 @@ function player.new(x, y, r)
     --print(#moveAngles)
     
     if #moveAngles > 0 then
-      isStopped = false
+      stopped = false
       local sum = 0
       for _,v in pairs(moveAngles) do -- Get the sum of all numbers in t
         sum = sum + v
