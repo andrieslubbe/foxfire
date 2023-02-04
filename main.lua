@@ -52,6 +52,15 @@ function distAngle(x1, y1, x2, y2)
 end
 
 function love.load()
+  sounds = {}
+  sounds.light = love.audio.newSource("assets/sounds/light.mp3", "static")
+  sounds.music = love.audio.newSource("assets/sounds/music.mp3", "static")
+  sounds.enemy_death = love.audio.newSource("assets/sounds/enemy_death.mp3", "static")
+  sounds.roots = love.audio.newSource("assets/sounds/roots.mp3", "static")
+  sounds.music:setLooping(true)
+  sounds.light:setLooping(true)
+  sounds.music:play()
+
   love.graphics.setDefaultFilter('nearest', 'nearest')
   push:setupScreen(gameWidth, gameHeight, screenWidth, screenHeight, {
     fullscreen = false,

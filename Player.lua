@@ -33,6 +33,8 @@ function player.new(x, y, r)
 
   function love.keypressed(key)
     if key == "space" then
+      sounds.roots:play()
+      sounds.light:play()
       --physics:setLinearVelocity(0,0)
       stopped = true
       --light = lighter:addLight(x, y, r*70, pal.bteal)
@@ -64,7 +66,8 @@ function player.new(x, y, r)
     physics:setLinearDamping(1.8)
     lightrad = 1
   end
- 
+  
+    
 
   function self.update(dt)
     --for i, p in ipairs(moss) do
@@ -100,8 +103,10 @@ function player.new(x, y, r)
 
     if stopped == true then
       self.still(dt)
+      
     else
       self.moving(dt)
+      sounds.light:stop()
     end
     
     lighter:updateLight(light, self:getX(), self:getY(), self.getRadius() * 2 * lightrad)
@@ -123,6 +128,9 @@ function player.new(x, y, r)
     end
     --print(#moveAngles)
     
+    
+    
+
     if #moveAngles > 0 then
       stopped = false
       local sum = 0
@@ -138,7 +146,7 @@ function player.new(x, y, r)
   
     --print(physics:getLinearVelocity())
 
-    
+  
   end
 
   function physics:draw()
@@ -149,7 +157,6 @@ function player.new(x, y, r)
     --love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
   end
 
-  
   return self
 
 end
