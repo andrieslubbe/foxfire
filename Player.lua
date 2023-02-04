@@ -82,7 +82,7 @@ function player.new(x, y, r)
       if spores > 0 then 
         spawnTimer = spawnFreq
         table.insert(moss, moss.new(self:getX(), self:getY()))
-        spores = spores - 1
+        --spores = spores - 1
       end
     end
     physics:setLinearDamping(1.8)

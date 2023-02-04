@@ -97,7 +97,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 0.5
+  freqenemy = 0.8
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 

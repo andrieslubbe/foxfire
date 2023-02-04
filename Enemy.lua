@@ -4,8 +4,8 @@ function enemy.new(x, y)
   local self = {}
   self.__index = self
   
-  local width = 8
-  local height = 8
+  local radius = 4
+  --local height = 8
   local pow = 40
   local dead = false
   local lit = 0
@@ -21,8 +21,9 @@ function enemy.new(x, y)
   --}
   --local poly = lighter:addPolygon(wall)
 
-  local physics = bf.Collider.new(world, 'Rectangle', x, y, width, height)
-  physics:setLinearDamping(1.2)
+  local physics = bf.Collider.new(world, 'Circle', x, y, radius)
+  physics:setLinearDamping(1)
+  physics:setRestitution(1)
 
   function self.getX()
     return physics.getX()
@@ -31,7 +32,7 @@ function enemy.new(x, y)
     return physics.getY()
   end
   function self.getRadius()
-    return width
+    return physics.getRadius()
   end
   function self.isDead()
     return dead
@@ -115,7 +116,7 @@ function enemy.new(x, y)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
       --love.graphics.setColor(0.875, 0.027, 0.447,0.2)
-      love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
+      love.graphics.circle('fill', self:getX(),self:getY(),self:getRadius())
     end
     
     
