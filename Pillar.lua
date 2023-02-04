@@ -3,6 +3,8 @@ pillar = {}
 function pillar.new(x, y, width, height)
   local self = {}
   self.__index = self
+  local width,height = width,height
+
 
   local wall = {
     x-width/2,y-height/2,
@@ -21,17 +23,17 @@ function pillar.new(x, y, width, height)
     return physics.getY()
   end
   function self.getWidth()
-    return physics.getWidth()
+    return width
   end
   function self.getHeight()
-    return physics.getHeight()
+    return height
   end
   physics:setType('static')
   setmetatable(self, physics)
 
 
   function physics:draw()
-    --love.graphics.setColor(unpack(pal.blue))
+    --love.graphics.setColor(0,0,0,0)
     --love.graphics.polygon('fill', wall)
   end
 

@@ -14,12 +14,13 @@ require 'Enemy'
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
 
-local font = love.graphics.newFont(28)
+local font = love.graphics.newFont(16)
 gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
 
 
 pal = {
+  green = {0.373,	1.000,	0.051},
   red =     {0.875, 0.027, 0.447},
   pink =    {0.996, 0.329, 0.435},
   orange =  {1.000, 0.620, 0.490},
@@ -87,15 +88,19 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 0.2
+  freqenemy = 4
   timerenemy= freqenemy
-  --local lightX, lightY = 500, 500
+  --local lightX, lightY = 500R, 500
 
 -- addLight signature: (x,y,radius,r,g,b,a)
   --local light = lighter:addLight(lightX, lightY, 300, pal.yellow)
   img_floor_night = love.graphics.newImage("assets/images/floor_night_test.png")
   img_floor_night:setWrap("repeat", "repeat")
   img_floor_night_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_floor_night:getWidth(), img_floor_night:getHeight())
+
+  img_shrooms = love.graphics.newImage("assets/images/shrooms.png")
+  img_shrooms:setWrap("repeat", "repeat")
+  img_shrooms_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_shrooms:getWidth(), img_shrooms:getHeight())
 end
 
 function randomPos(rad)
@@ -133,9 +138,11 @@ function love.update(dt)
   end
   timerenemy = timerenemy - dt
   if timerenemy < 0 then
-    timerenemy = freqenemy
-    local pos = randomPos(4)
-    table.insert(enemy, enemy.new(pos.x, pos.y))
+    if #enemy <200 then
+      timerenemy = freqenemy
+      local pos = randomPos(4)
+      table.insert(enemy, enemy.new(pos.x, pos.y))
+    end
   end
 
 end
@@ -163,7 +170,7 @@ function drawLights()
 end
 
 local function shadowStencil()
-  --love.graphics.setColor(0,0,0)
+  love.graphics.setColor(1,1,1,1)
 
   lighter:drawLights()
   --love.graphics.setColor(1,1,1)
@@ -172,9 +179,37 @@ local function shadowStencil()
   --push:finish()
 end
 local function playerStencil()
-  love.graphics.setColor(0,0,0)
-  love.graphics.circle('fill', plant:getX(), plant:getY(), plant:getLight() * plant.getRadius()/20)
+  love.graphics.setColor(1,1,1,1)
+  love.graphics.circle('fill', plant:getX(), plant:getY(), plant:getLight() * plant.getRadius()/2.5)
 end
+
+local function shroomStencil()
+  love.graphics.setColor(1,1,1,.4)
+  for i, v in ipairs(moss) do
+    love.graphics.circle("fill", 
+      v.getX(),-- / gameWidth * screenWidth, 
+      v.getY(), --/ gameHeight * screenHeight, 
+      v.getRadius()) --/ gameHeight * screenHeight)
+  end
+  --love.graphics.setColor(0,0,0)
+  
+  --love.graphics.setColor(1,1,1)
+end
+
+
+local function pillarStencil()
+  --love.graphics.setColor(0,1,1,1)
+  for i, v in ipairs(pillar) do
+    love.graphics.rectangle("fill", 
+      v.getX()-v.getWidth()/2,
+      v.getY()-v.getHeight()/2,
+      v.getWidth(),
+      v.getHeight()) 
+  end
+  
+end
+
+
 
 function love.draw()
   --preDrawLights()
@@ -186,7 +221,7 @@ function love.draw()
   --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
   --love.graphics.seartStencilTest()
     
-  love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  
   --preDrawLights()
   --love.graphics.clear(pal.purple)
   
@@ -204,7 +239,7 @@ function love.draw()
   for i, p in ipairs(moss) do
     p.draw()
   end
-  --love.graphics.clear(pal.yellow)
+  --love.graphics.clear(pal.purple)
   --love.graphics.setStencilTest()
   
   
@@ -213,11 +248,42 @@ function love.draw()
   for i, p in ipairs(enemy) do
     p.draw()
   end
-  lighter:drawLights()
+
+  love.graphics.stencil(shroomStencil, "replace", 1)
+  love.graphics.stencil(pillarStencil, "replace",0,true)
+  
+  
+  --love.graphics.setColor(1,1,1)
+  love.graphics.setStencilTest("equal",1)
+  --
+  --love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  
+  love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+  love.graphics.draw(img_shrooms, img_shrooms_quad, 0, 0)
+  
+  
+ love.graphics.stencil(playerStencil,"replace",1,false)
+ love.graphics.stencil(shroomStencil, "replace",0,true)
+ love.graphics.setStencilTest("equal",1)
+ love.graphics.draw(img_floor_night,img_floor_night_quad, 0,0)
+
+  --love.graphics.setStencilTest("greater",0)
+  --love.graphics.stencil(shadowStencil, "replace",1,false)
+  --love.graphics.clear(pal.purple)
   love.graphics.setStencilTest()
+  
+  --love.graphics.stencil(pillarStencil, "replace", 1, false)
+  --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
+
+  lighter:drawLights()
+  --love.graphics.setStencilTest()
   world:draw()
   love.graphics.setFont(font)
-  love.graphics.printf(plant.getSpores(), 0, gameHeight/16, gameWidth, 'center')
+  local ammo = ''
+  for i=1,plant.getSpores() do
+    ammo = ammo .. '•'
+  end
+  love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
   
   push:finish()
   

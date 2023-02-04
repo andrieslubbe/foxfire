@@ -74,6 +74,17 @@ function enemy.new(x, y)
     
   end
 
+  function physics:postSolve(other)
+    if other.identity == 'player' then
+      if self.lit > 0 then
+        self.kill()
+      else
+        
+      end
+    --  --print("collect")
+    --  chain = chain + 1
+    end
+  end
 
   function self.draw()
     

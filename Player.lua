@@ -84,7 +84,9 @@ function player.new(x, y, r)
       end
     end
     physics:setLinearDamping(1.8)
-    lightrad = 1
+    if lightrad > 1 then 
+      lightrad = lightrad - dt * lightgrow*5
+    end
   end
   
     

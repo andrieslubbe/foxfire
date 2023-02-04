@@ -5,7 +5,7 @@ function moss.new(x, y)
   self.__index = self
 
   --local rad= 4
-  local growrate = 0.1
+  local growrate = 2
   local decay = 1
   local lightscale = 10
   local x = x
@@ -15,7 +15,7 @@ function moss.new(x, y)
   local dead = false
   local lit = 0
   local energy = 3
-  local light = lighter:addLight(x, y, life, pal.bteal)
+  local light = lighter:addLight(x, y, life, 0.373,	1.000,	0.051 , 0.5)
 
   --local physics = bf.Collider.new(world, 'Circle', x, y, 4)
   function self.getX()
@@ -80,7 +80,7 @@ function moss.new(x, y)
         --self:hit()
       end
     end
-    lighter:updateLight(light, nil, nil, life*2.5)
+    lighter:updateLight(light, nil, nil, life*2.8)
 
   end
 
