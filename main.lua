@@ -83,7 +83,7 @@ function love.load()
 
   plant = player.new(gameWidth/2, gameHeight/2, 8)
 
-  for i = 1, 20 do
+  for i = 1, 80 do
     local rad = 12
     local pos = randomPos(rad)
     table.insert(pillar, pillar.new(pos.x, pos.y, rad*2,rad*2))
@@ -97,7 +97,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 1
+  freqenemy = 0.5
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 
@@ -145,6 +145,17 @@ function explode(x, y, col)
   end
 end
 
+function enemySpawner(dt)
+  timerenemy = timerenemy - dt
+  if timerenemy < 0 then
+    if #enemy <200 then
+      timerenemy = freqenemy
+      local pos = randomPos(4)
+      table.insert(enemy, enemy.new(pos.x, pos.y))
+    end
+  end
+end
+
 function love.update(dt)
   --animation:update(dt)
   --joysticks = love.joystick.getJoysticks()
@@ -155,20 +166,15 @@ function love.update(dt)
     en.update(dt)
     if en.isDead() then
       explode(en.getX()+en.getRadius()/2, en.getY()+en.getRadius()/2, 'pink')
-      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()))
+      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()/2))
       en.destroy()
       table.remove(enemy, i)
       score = score + 1
     end
   end
-  timerenemy = timerenemy - dt
-  if timerenemy < 0 then
-    if #enemy <200 then
-      timerenemy = freqenemy
-      local pos = randomPos(4)
-      table.insert(enemy, enemy.new(pos.x, pos.y))
-    end
-  end
+  
+  enemySpawner(dt)
+
   for i=#blood,1,-1 do
     bl = blood[i]
     bl.update(dt)
@@ -249,6 +255,20 @@ local function pillarStencil()
       v.getHeight()) 
   end
   
+end
+
+local function enemyStencil()
+  love.graphics.setColor(1,1,1,.4)
+  for i, v in ipairs(enemy) do
+    love.graphics.rectangle("fill", 
+      v.getX()-v.getRadius()/2,
+      v.getY()-v.getRadius()/2,
+      v.getWidth(),
+      v.getHeight())
+  end
+  --love.graphics.setColor(0,0,0)
+  
+  --love.graphics.setColor(1,1,1)
 end
 
 

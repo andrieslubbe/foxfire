@@ -6,10 +6,13 @@ function enemy.new(x, y)
   
   local width = 8
   local height = 8
-  local pow = 30
+  local pow = 40
   local dead = false
   local lit = 0
   local trap = 0
+  local hit = 0
+  --local freqmove = math.random(15,40)/10
+  --local timermove = 0
   --local wall = {
   --  x-width/2,y-height/2,
   --  x+width/2,y-height/2,
@@ -19,7 +22,7 @@ function enemy.new(x, y)
   --local poly = lighter:addPolygon(wall)
 
   local physics = bf.Collider.new(world, 'Rectangle', x, y, width, height)
-  physics:setLinearDamping(1)
+  physics:setLinearDamping(1.2)
 
   function self.getX()
     return physics.getX()
@@ -47,6 +50,11 @@ function enemy.new(x, y)
   end
 
   function self.update(dt)
+    --timermove = timermove - dt
+    --if timermove < 0 then
+    --  timermove = freqmove
+    --  
+    --end
     if lit == 0  then
       
       local a = getAngle(self:getX(), self:getY(), plant.getX(), plant.getY())
@@ -68,6 +76,30 @@ function enemy.new(x, y)
         trap = 0
       end
     end 
+    if hit > 0 then
+      physics:setLinearDamping(0.05)
+      hit = hit - dt
+    end 
+    if hit < 0 then 
+      physics:setLinearDamping(1.2) 
+      hit = 0
+    end
+  end
+
+  function physics:postSolve(other)
+    if other.identity == 'player' then
+      if trap > 0 then
+        --self:kill()
+        hit = 1
+        --dead = true
+      else
+        --TODO: damage player
+      end
+    elseif other.identity == 'pillar' then
+      if hit > 0 then
+        dead = true
+      end
+    end
   end
 
   function physics:draw(alpha)
@@ -76,30 +108,17 @@ function enemy.new(x, y)
       col = pal.white
     end
     love.graphics.setColor(col)
-    if lit>0 then
+    if lit>0 or hit>0 then
       --style = 'fill'
       --love.graphics.setColor(unpack(pal.white))
       --love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
-     
+      --love.graphics.setColor(0.875, 0.027, 0.447,0.2)
       love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     end
     
     
-  end
-
-  function physics:postSolve(other)
-    if other.identity == 'player' then
-      if trap > 0 then
-        --self:kill()
-        dead = true
-      else
-        --TODO: damage player
-      end
-    --  --print("collect")
-    --  chain = chain + 1
-    end
   end
 
   function self.draw()

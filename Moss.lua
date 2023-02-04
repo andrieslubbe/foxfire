@@ -7,7 +7,7 @@ function moss.new(x, y)
   --local rad= 4
   local growrate = 2
   local decay = 1
-  local lightscale = 10
+  local lightscale = 20
   local x = x
   local y = y
   
@@ -41,7 +41,7 @@ function moss.new(x, y)
     --print(lit)
   end
   function self.hit()
-    life = life -3
+    life = life - 0.2
   end
 
   function self.update(dt)
@@ -77,6 +77,7 @@ function moss.new(x, y)
       if dist < life   then
         p.lit()
         p.trap()
+        self:hit()
       end
       if dist < self:getRadius() + p.getRadius() then
         --p.kill()
@@ -86,17 +87,19 @@ function moss.new(x, y)
     for i, p in ipairs(blood) do
       local dist = distanceBetween(p.getX(), p.getY(), self:getX(), self:getY())
       if dist < life + p.getRadius() then
-        self:hit()
+        --self:hit()
+        dead = true
         p.hit()
       end
     end
-    lighter:updateLight(light, nil, nil, life*2)
+    --TODO: tune light alphan
+    lighter:updateLight(light, nil, nil, life*2, nil, nil, nil, 0.8/(life+1)^0.1)
 
   end
 
   function self.draw()
-    love.graphics.setColor(1,1,1, 0.1)
-    love.graphics.circle('line', x, y, life)
+    --love.graphics.setColor(1,1,1, 0.1)
+    --love.graphics.circle('line', x, y, life)
   end
 
   return self

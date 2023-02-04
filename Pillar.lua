@@ -14,6 +14,7 @@ function pillar.new(x, y, width, height)
   }
   local light = lighter:addPolygon(wall)
   local physics = bf.Collider.new(world, 'Rectangle', x, y, width, height)
+  physics.identity = 'pillar'
   --local physics = world:newRectangleCollider(x,y,width,height)
 
   function self.getX()
