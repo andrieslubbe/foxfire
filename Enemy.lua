@@ -96,7 +96,7 @@ function enemy.new(x, y)
       else
         --TODO: damage player
       end
-    elseif other.identity == 'pillar' then
+    elseif other.identity == 'pillar' or other.identity == 'wall' then
       if hit > 0 then
         dead = true
       end
@@ -104,21 +104,22 @@ function enemy.new(x, y)
   end
 
   function physics:draw(alpha)
+    local style = 'line'
     local col = pal.red
     if trap>0 then
       col = pal.white
     end
     love.graphics.setColor(col)
     if lit>0 or hit>0 then
-      --style = 'fill'
+      style = 'fill'
       --love.graphics.setColor(unpack(pal.white))
       --love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
       --love.graphics.setColor(0.875, 0.027, 0.447,0.2)
-      love.graphics.circle('fill', self:getX(),self:getY(),self:getRadius())
+      
     end
-    
+    love.graphics.circle(style, self:getX(),self:getY(),self:getRadius())
     
   end
 

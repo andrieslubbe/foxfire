@@ -50,7 +50,7 @@ function blood.new(x, y, r)
   end
 
   function self.draw()
-    love.graphics.setColor(0.996, 0.329, 0.435, 1)
+    love.graphics.setColor(pal.purple)
     love.graphics.circle("fill", x,y,r)
   end
 

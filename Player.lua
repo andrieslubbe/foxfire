@@ -9,7 +9,7 @@ function player.new(x, y, r)
   local lightrad = lightradmin
   local light = lighter:addLight(x, y, r, pal.teal)
   local lightgrow = 20
-  local maxLight = 40
+  local maxLight = 80
   local stopped = false
   local spawnFreq = .3
   local spawnTimer = spawnFreq

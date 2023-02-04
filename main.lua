@@ -13,6 +13,7 @@ require 'Moss'
 require 'Enemy'
 require 'Blood'
 require 'Particles'
+require 'Wall'
 
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
@@ -24,6 +25,7 @@ screenWidth, screenHeight = 1920, 1080
 
 local sprites, animation
 local score
+local pillarcount = 100
 
 pal = {
   green = {0.373,	1.000,	0.051},
@@ -83,7 +85,7 @@ function love.load()
 
   plant = player.new(gameWidth/2, gameHeight/2, 8)
 
-  for i = 1, 80 do
+  for i = 1, pillarcount do
     local rad = 12
     local pos = randomPos(rad)
     table.insert(pillar, pillar.new(pos.x, pos.y, rad*2,rad*2))
@@ -100,6 +102,12 @@ function love.load()
   freqenemy = 0.8
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
+
+  wallThicknes = 2
+  table.insert(wall, wall.new(gameWidth/2, gameHeight+wallThicknes, gameWidth + wallThicknes*2, wallThicknes))
+  table.insert(wall, wall.new(gameWidth/2, -wallThicknes, gameWidth + wallThicknes * 2, wallThicknes))
+  table.insert(wall, wall.new(-wallThicknes, gameHeight/2, wallThicknes, gameHeight))
+  table.insert(wall, wall.new(gameWidth+wallThicknes, gameHeight/2, wallThicknes, gameHeight))
 
 -- addLight signature: (x,y,radius,r,g,b,a)
   --local light = lighter:addLight(lightX, lightY, 300, pal.yellow)
@@ -166,7 +174,7 @@ function love.update(dt)
     en.update(dt)
     if en.isDead() then
       explode(en.getX()+en.getRadius()/2, en.getY()+en.getRadius()/2, 'pink')
-      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()/2))
+      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()*5))
       en.destroy()
       table.remove(enemy, i)
       score = score + 1
@@ -363,8 +371,8 @@ function love.draw()
   love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
 
 
- -- love.graphics.printf(love.timer.getFPS( ),0,gameHeight/3, gameWidth,'center')
+ -- 
   --animation:draw(sprite, plant:getX()-plant:getRadius(),plant:getY()-plant:getRadius())
   push:finish()
-  
+  love.graphics.print(love.timer.getFPS( ),10,10)
 end

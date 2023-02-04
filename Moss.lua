@@ -6,7 +6,7 @@ function moss.new(x, y)
 
   --local rad= 4
   local growrate = 2
-  local decay = 1
+  local decay = 2
   local lightscale = 20
   local x = x
   local y = y
@@ -77,7 +77,7 @@ function moss.new(x, y)
       if dist < life   then
         p.lit()
         p.trap()
-        self:hit()
+        --self:hit()
       end
       if dist < self:getRadius() + p.getRadius() then
         --p.kill()
