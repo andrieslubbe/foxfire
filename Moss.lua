@@ -41,7 +41,7 @@ function moss.new(x, y)
     --print(lit)
   end
   function self.hit()
-    life = life - 0.2
+    life = life - 8
   end
 
   function self.update(dt)
@@ -89,7 +89,7 @@ function moss.new(x, y)
       if dist < life + p.getRadius() then
         --self:hit()
         dead = true
-        p.hit()
+        --p.hit()
       end
     end
     --TODO: tune light alphan

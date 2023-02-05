@@ -12,6 +12,8 @@ function blood.new(x, y, r)
   
   --local life = lifemax
 
+  local light = lighter:addLight(x, y, r, pal.red)
+
   function self.hit()
     hit = 1
   end
@@ -34,6 +36,7 @@ function blood.new(x, y, r)
     --if r > lifemax then
     --  grow = 0
     --end
+    lighter:updateLight(light, nil, nil, r*2.5)
   end
   function self.getX()
     return x
@@ -49,8 +52,12 @@ function blood.new(x, y, r)
     return r <= 0
   end
 
+  function self.destroy()
+
+  end
+
   function self.draw()
-    love.graphics.setColor(pal.purple)
+    love.graphics.setColor(0.875, 0.027, 0.447,0.5)
     love.graphics.circle("fill", x,y,r)
   end
 

@@ -4,7 +4,7 @@ function player.new(x, y, r)
   local self = {}
   self.__index = self
   
-  local speed = 2400
+  local speed = 40
   local lightradmin = 3
   local lightrad = lightradmin
   local light = lighter:addLight(x, y, r, pal.teal)
@@ -20,7 +20,7 @@ function player.new(x, y, r)
 
   local physics = bf.Collider.new(world, 'Circle', x, y, r)
   --local physics = world:newRectangleCollider(x,y,r/2,height)
-  physics:setLinearDamping(1.8)
+  physics:setLinearDamping(.9)
   physics.identity = "player"
   --setmetatable(self, physics)
 
@@ -164,8 +164,8 @@ function player.new(x, y, r)
         end
         local moveAngle = sum / #moveAngles
         --moveAngle = moveAngle % (2 * math.pi)
-        local xbounce = math.cos(moveAngle) * speed * dt
-        local ybounce = math.sin(moveAngle) * speed * dt
+        local xbounce = math.cos(moveAngle) * speed
+        local ybounce = math.sin(moveAngle) * speed
         physics:applyForce(xbounce,ybounce)
       else 
         stopped = true

@@ -25,7 +25,9 @@ screenWidth, screenHeight = 1920, 1080
 
 local sprites, animation
 local score
-local pillarcount = 100
+local pillarcount
+local timelimit = 300
+local timetaken
 
 pal = {
   green = {0.373,	1.000,	0.051},
@@ -59,6 +61,9 @@ function distAngle(x1, y1, x2, y2)
 end
 
 function love.load()
+  timetaken = 0
+  pillarcount = 100
+  pause = true
   score = 0
   sounds = {}
   sounds.light = love.audio.newSource("assets/sounds/light.mp3", "static")
@@ -99,7 +104,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 0.8
+  freqenemy = 2
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 
@@ -118,6 +123,15 @@ function love.load()
   img_shrooms = love.graphics.newImage("assets/images/shrooms.png")
   img_shrooms:setWrap("repeat", "repeat")
   img_shrooms_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_shrooms:getWidth(), img_shrooms:getHeight())
+end
+
+function love.keypressed(key, scancode, isrepeat)
+  if key == "escape" then
+    love.event.quit("restart")
+  end
+  if key == "space" then
+    pause = not pause
+  end
 end
 
 function randomPos(rad)
@@ -165,6 +179,13 @@ function enemySpawner(dt)
 end
 
 function love.update(dt)
+  if pause then
+    return
+  end
+  if #pillar == 0 or timetaken >= timelimit then
+    pause = true
+  end
+  timetaken = timetaken + dt
   --animation:update(dt)
   --joysticks = love.joystick.getJoysticks()
   world:update(dt)
@@ -174,7 +195,7 @@ function love.update(dt)
     en.update(dt)
     if en.isDead() then
       explode(en.getX()+en.getRadius()/2, en.getY()+en.getRadius()/2, 'pink')
-      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()*5))
+      table.insert(blood, blood.new(en.getX()+en.getRadius()/2,en.getY()+en.getRadius()/2,en.getRadius()*2))
       en.destroy()
       table.remove(enemy, i)
       score = score + 1
@@ -183,11 +204,20 @@ function love.update(dt)
   
   enemySpawner(dt)
 
+  for i=#pillar,1,-1 do
+    pil = pillar[i]
+    
+    if pil.isDead() then 
+      pil.destroy()
+      table.remove(pillar,i)
+    end
+  end
+
   for i=#blood,1,-1 do
     bl = blood[i]
     bl.update(dt)
     if bl.isDead() then 
-      
+      bl.destroy()
       table.remove(blood,i)
     end
   end
@@ -354,25 +384,70 @@ function love.draw()
   --love.graphics.draw(img_floor_night, img_floor_night_quad, 0, 0)
 
   lighter:drawLights()
-  --love.graphics.setStencilTest()
-  world:draw()
   for i, p in ipairs(particles) do
     p.draw()
   end
+  --love.graphics.setStencilTest()
+  world:draw()
   
-  local ammo = ''
-  for i=1,plant.getSpores() do
-    ammo = ammo .. '•'
+  
+  --local ammo = ''
+  --for i=1,plant.getSpores() do
+  --  ammo = ammo .. '•'
+  --end
+  
+  local progress = ''
+  for i=1,#pillar  do
+    progress = progress .. '|'
+  end
+  for i=1,pillarcount - #pillar  do
+    progress = progress .. '-'
   end
   love.graphics.setFont(font)
   love.graphics.setColor(pal.white)
-  love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
+  --love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
   --love.graphics.setFont(fontS)
-  love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
+  --love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
+  love.graphics.printf(progress, 0, gameHeight/16-10, gameWidth, 'center')
 
+  local timestring = ''
+  for i=1,math.ceil(timetaken)  do
+    timestring = timestring .. '\\'
+  end
+  for i=1,timelimit - math.ceil(timetaken)  do
+    timestring = timestring .. '|'
+  end
+  love.graphics.setFont(fontS)
+  love.graphics.printf(timestring, 0, gameHeight/16-30, gameWidth, 'center')
 
  -- 
   --animation:draw(sprite, plant:getX()-plant:getRadius(),plant:getY()-plant:getRadius())
+  
   push:finish()
   love.graphics.print(love.timer.getFPS( ),10,10)
+  if pause then
+    drawMenu()
+  end
+end
+
+function drawOutlineRec(y,width,height)
+  love.graphics.setColor(pal.blue)
+  love.graphics.rectangle("fill",screenWidth/2-width/2,y-13,width,height,4,4)
+  love.graphics.setColor(unpack(pal.bteal))
+  love.graphics.rectangle("line",screenWidth/2-width/2,y-13,width,height,4,4)
+end
+
+function drawMenu()
+  --love.graphics.setColor(.2,.2,.2,.2)
+  love.graphics.setColor(1, 1, 1, 0.05)
+  love.graphics.rectangle("fill",0,0,screenWidth,screenHeight)
+  love.graphics.setColor(pal.green)
+  --drawOutlineRec(screenHeight/4,80,48)
+  drawOutlineRec(screenHeight/5*4,160,40)
+  love.graphics.setColor(pal.white)
+  love.graphics.setFont(font)
+  --love.graphics.printf("| |", 0, screenHeight/4 , screenWidth, 'center')
+  --love.graphics.printf("ESC", 0, screenHeight/4 , screenWidth, 'center')
+  love.graphics.setFont(fontS)
+  love.graphics.printf("|____________|", 0, screenHeight/5*4 , screenWidth, 'center')
 end

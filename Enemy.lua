@@ -24,6 +24,7 @@ function enemy.new(x, y)
   local physics = bf.Collider.new(world, 'Circle', x, y, radius)
   physics:setLinearDamping(1)
   physics:setRestitution(1)
+  physics.identity = 'enemy'
 
   function self.getX()
     return physics.getX()
@@ -85,6 +86,10 @@ function enemy.new(x, y)
       physics:setLinearDamping(1.2) 
       hit = 0
     end
+
+    table.insert(particles, particles.new(
+        physics.getX(),physics.getY(),physics.getRadius()-1,
+        'blue', 1, 1, 0,0))
   end
 
   function physics:postSolve(other)
@@ -96,7 +101,12 @@ function enemy.new(x, y)
       else
         --TODO: damage player
       end
-    elseif other.identity == 'pillar' or other.identity == 'wall' then
+    elseif other.identity == 'pillar'then
+      if hit > 0 then
+        other.dead = true
+        dead = true
+      end
+    elseif other.identity == 'wall' then
       if hit > 0 then
         dead = true
       end
@@ -107,18 +117,24 @@ function enemy.new(x, y)
     local style = 'line'
     local col = pal.red
     if trap>0 then
-      col = pal.white
+      col = pal.teal
     end
-    love.graphics.setColor(col)
-    if lit>0 or hit>0 then
+    
+    if lit>0  then
       style = 'fill'
       --love.graphics.setColor(unpack(pal.white))
       --love.graphics.rectangle('fill', self:getX(),self:getY(),width,height)
     --else
     --  love.graphics.setColor(unpack(pal.orange))
       --love.graphics.setColor(0.875, 0.027, 0.447,0.2)
-      
     end
+    if hit>0 then
+      style = 'fill'
+      col = pal.white
+    end
+    love.graphics.setColor(0,0,0)
+    love.graphics.circle('fill', self:getX(),self:getY(),self:getRadius())
+    love.graphics.setColor(col)
     love.graphics.circle(style, self:getX(),self:getY(),self:getRadius())
     
   end
