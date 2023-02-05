@@ -134,6 +134,14 @@ function love.load()
   img_shrooms_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_shrooms:getWidth(), img_shrooms:getHeight())
 end
 
+
+function love.gamepadpressed(joystick, button)
+  if button == 'start' then
+      --print("pause")
+      pause = not pause
+  end
+end
+
 function love.keypressed(key, scancode, isrepeat)
   if key == "escape" then
     love.event.quit("restart")
@@ -199,7 +207,7 @@ function love.update(dt)
     p.update(dt)
   end
   --animation:update(dt)
-  --joysticks = love.joystick.getJoysticks()
+  joysticks = love.joystick.getJoysticks()
   world:update(dt)
   plant.update(dt)
   for i=#enemy,1,-1 do
@@ -429,7 +437,7 @@ function love.draw()
   --love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
   --love.graphics.setFont(fontS)
   --love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
-  love.graphics.printf(progress, 0, gameHeight/16-10, gameWidth, 'center')
+  love.graphics.printf(progress, 0, gameHeight/16*15+10, gameWidth, 'center')
 
   local timestring = ''
   for i=1,math.ceil(timetaken)  do
@@ -447,7 +455,7 @@ function love.draw()
   
   push:finish()
   love.graphics.draw(img_hourglass,screenWidth-54,13)
-  love.graphics.print(love.timer.getFPS( ),10,10)
+  --love.graphics.print(love.timer.getFPS( ),10,10)
   if pause then
     drawMenu()
   end

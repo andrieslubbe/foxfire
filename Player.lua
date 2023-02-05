@@ -141,7 +141,21 @@ function player.new(x, y, r)
     lighter:updateLight(light, self:getX(), self:getY(), lightrad * self:getRadius())
     local moveAngles = {}
   
-   
+    if #joysticks > 0 then
+      joystick = joysticks[1]
+      local xaxis = joystick:getGamepadAxis("leftx")
+      local yaxis = joystick:getGamepadAxis("lefty")
+      local xbounce = xaxis * speed
+      local ybounce = yaxis * speed
+      if math.abs(xaxis) < 0.2 and math.abs(yaxis) < 0.2 then 
+        stopped = true
+      else 
+        stopped = false
+        physics:applyForce(xbounce, ybounce)
+      end
+      --print(xaxis, yaxis)
+      
+    else
       if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
         table.insert(moveAngles, math.pi * 1.5)
         if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
@@ -172,7 +186,7 @@ function player.new(x, y, r)
       else 
         stopped = true
       end
-    
+    end
     --print(physics:getLinearVelocity())
 
   
@@ -184,8 +198,8 @@ function player.new(x, y, r)
   end
 
   function self.draw()
-    --love.graphics.setColor(unpack(pal.yellow))
-    --love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
+    love.graphics.setColor(1,1,1,0.2)
+    love.graphics.circle('fill', self:getX(), self:getY(), self:getRadius())
     --lighter:drawVisibilityPolygon(light)
     
   end

@@ -11,7 +11,8 @@ function enemy.new(x, y)
   local lit = 0
   local trap = 0
   local hit = 0
-  local rest =2
+  local restmax = 1.6
+  local rest = restmax
   --local freqmove = math.random(15,40)/10
   --local timermove = 0
   --local wall = {
@@ -49,7 +50,7 @@ function enemy.new(x, y)
     lit = 1
   end
   function self.trap()
-    trap = 1
+    trap = 2
   end
 
   function self.update(dt)
@@ -87,8 +88,11 @@ function enemy.new(x, y)
       physics:setLinearDamping(1.2) 
       hit = 0
     end
-    if rest < 2 then
+    if rest < restmax then
       rest = rest + dt
+      if rest > restmax then
+        rest = restmax
+      end
     end
     physics:setRestitution(rest)
     table.insert(particles, particles.new(
