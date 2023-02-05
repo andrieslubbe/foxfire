@@ -18,7 +18,7 @@ require 'Flower'
 
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
-
+local fontL = love.graphics.newFont(48)
 local font = love.graphics.newFont(16)
 local fontS = love.graphics.newFont(10)
 gameWidth, gameHeight = 960, 540
@@ -70,7 +70,7 @@ function love.load()
   pause = true
   score = 0
 
-  table.insert(flower, flower.new(300,200))
+  --table.insert(flower, flower.new(300,200))
   sounds = {}
   sounds.light = love.audio.newSource("assets/sounds/light.mp3", "static")
   sounds.music = love.audio.newSource("assets/sounds/music.mp3", "static")
@@ -139,6 +139,8 @@ function love.gamepadpressed(joystick, button)
   if button == 'start' then
       --print("pause")
       pause = not pause
+  elseif button =='x' then
+    love.event.quit("restart")
   end
 end
 
@@ -476,8 +478,8 @@ function drawMenu()
   --drawOutlineRec(screenHeight/4,80,48)
   drawOutlineRec(screenHeight/5*4,160,40)
   love.graphics.setColor(pal.white)
-  love.graphics.setFont(font)
-  --love.graphics.printf("| |", 0, screenHeight/4 , screenWidth, 'center')
+  love.graphics.setFont(fontL)
+  love.graphics.printf("| |", 0, screenHeight/4 , screenWidth, 'center')
   --love.graphics.printf("ESC", 0, screenHeight/4 , screenWidth, 'center')
   love.graphics.setFont(fontS)
   love.graphics.printf("|____________|", 0, screenHeight/5*4 , screenWidth, 'center')

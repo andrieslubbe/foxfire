@@ -59,20 +59,23 @@ function enemy.new(x, y)
     --  timermove = freqmove
     --  
     --end
-    if lit == 0  then
-      
+    if lit > 0  then
+      physics:setLinearDamping(10)
+    else
+      physics:setLinearDamping(1)
+    end
       local a = getAngle(self:getX(), self:getY(), plant.getX(), plant.getY())
       local xbounce = math.cos(a) * pow
       local ybounce = math.sin(a) * pow
       physics:applyForce(xbounce,ybounce)
       --lighter:updatePolygon(light, self:getX(), self:getY())
       --poly = 
-    else
+    --else
       lit = lit - dt
       if lit < 0 then
         lit = 0
       end
-    end
+    --end
 
     if trap > 0 then
       trap = trap - dt
