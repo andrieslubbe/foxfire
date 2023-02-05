@@ -14,6 +14,7 @@ require 'Enemy'
 require 'Blood'
 require 'Particles'
 require 'Wall'
+require 'Flower'
 
 lighter = Lighter()
 --Lighter:newWorld(800,600,{0,0,0,0.99})
@@ -23,7 +24,10 @@ local fontS = love.graphics.newFont(10)
 gameWidth, gameHeight = 960, 540
 screenWidth, screenHeight = 1920, 1080
 
-local sprites, animation
+--spriteflower, animflower, gflower
+spriteflower = love.graphics.newImage("assets/images/flower-Sheet.png")
+  gflower = anim8.newGrid(32,32, spriteflower:getWidth(), spriteflower:getHeight())
+  
 local score
 local pillarcount
 local timelimit = 300
@@ -62,21 +66,24 @@ end
 
 function love.load()
   timetaken = 0
-  pillarcount = 100
+  pillarcount = 80
   pause = true
   score = 0
+
+  table.insert(flower, flower.new(300,200))
   sounds = {}
   sounds.light = love.audio.newSource("assets/sounds/light.mp3", "static")
   sounds.music = love.audio.newSource("assets/sounds/music.mp3", "static")
   sounds.enemy_death = love.audio.newSource("assets/sounds/enemy_death.mp3", "static")
   sounds.roots = love.audio.newSource("assets/sounds/roots.mp3", "static")
+  sounds.boom = love.audio.newSource("assets/sounds/far_off_boom.mp3", "static")
+  sounds.hit = love.audio.newSource("assets/sounds/hit-swing-sword-small-2.mp3", "static")
   sounds.music:setLooping(true)
   sounds.light:setLooping(true)
+  sounds.light:setVolume(0.5)
   sounds.music:play()
 
-  --sprite = love.graphics.newImage("assets/images/flower-Sheet.png")
-  --local g = anim8.newGrid(32,32, sprite:getWidth(), sprite:getHeight())
-  --animation = anim8.newAnimation(g('1-5',1), 0.1, 'pauseAtEnd')
+  
 
   love.graphics.setDefaultFilter('nearest', 'nearest')
   push:setupScreen(gameWidth, gameHeight, screenWidth, screenHeight, {
@@ -104,7 +111,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 2
+  freqenemy = 1
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 
@@ -116,6 +123,8 @@ function love.load()
 
 -- addLight signature: (x,y,radius,r,g,b,a)
   --local light = lighter:addLight(lightX, lightY, 300, pal.yellow)
+  img_hourglass = love.graphics.newImage("assets/images/hourglass.png")
+
   img_floor_night = love.graphics.newImage("assets/images/floor_night_test.png")
   img_floor_night:setWrap("repeat", "repeat")
   img_floor_night_quad = love.graphics.newQuad(0, 0, screenWidth, screenHeight, img_floor_night:getWidth(), img_floor_night:getHeight())
@@ -163,14 +172,14 @@ function explode(x, y, col)
   for i=1,5 do
     table.insert(particles, particles.new(
       x,y,4,
-      'red',2,1.1,math.random()*2*math.pi,math.random(7,12)))
+      'teal',2,1.1,math.random()*2*math.pi,math.random(7,12)))
   end
 end
 
 function enemySpawner(dt)
   timerenemy = timerenemy - dt
   if timerenemy < 0 then
-    if #enemy <200 then
+    if #enemy < 12 then
       timerenemy = freqenemy
       local pos = randomPos(4)
       table.insert(enemy, enemy.new(pos.x, pos.y))
@@ -186,6 +195,9 @@ function love.update(dt)
     pause = true
   end
   timetaken = timetaken + dt
+  for i, p in ipairs(flower) do
+    p.update(dt)
+  end
   --animation:update(dt)
   --joysticks = love.joystick.getJoysticks()
   world:update(dt)
@@ -208,8 +220,11 @@ function love.update(dt)
     pil = pillar[i]
     
     if pil.isDead() then 
+      sounds.boom:play()
+      table.insert(flower, flower.new(pil.getX()-pil.getWidth()/2,pil.getY()-pil.getHeight()/2))
       pil.destroy()
       table.remove(pillar,i)
+      
     end
   end
 
@@ -230,7 +245,9 @@ function love.update(dt)
       particle.update(dt)
     end
   end
-
+  for i, p in ipairs(flower) do
+    p.update(dt)
+  end
 end
 
 -- Call after your light positions have been updated
@@ -387,6 +404,9 @@ function love.draw()
   for i, p in ipairs(particles) do
     p.draw()
   end
+  for i, p in ipairs(flower) do
+    p.draw()
+  end
   --love.graphics.setStencilTest()
   world:draw()
   
@@ -404,7 +424,8 @@ function love.draw()
     progress = progress .. '-'
   end
   love.graphics.setFont(font)
-  love.graphics.setColor(pal.white)
+  
+  love.graphics.setColor(pal.yellow)
   --love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
   --love.graphics.setFont(fontS)
   --love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
@@ -418,12 +439,14 @@ function love.draw()
     timestring = timestring .. '|'
   end
   love.graphics.setFont(fontS)
+  love.graphics.setColor(pal.white)
   love.graphics.printf(timestring, 0, gameHeight/16-30, gameWidth, 'center')
-
+  
  -- 
   --animation:draw(sprite, plant:getX()-plant:getRadius(),plant:getY()-plant:getRadius())
   
   push:finish()
+  love.graphics.draw(img_hourglass,screenWidth-54,13)
   love.graphics.print(love.timer.getFPS( ),10,10)
   if pause then
     drawMenu()

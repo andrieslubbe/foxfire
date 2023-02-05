@@ -6,11 +6,12 @@ function enemy.new(x, y)
   
   local radius = 4
   --local height = 8
-  local pow = 40
+  local pow = 4
   local dead = false
   local lit = 0
   local trap = 0
   local hit = 0
+  local rest =2
   --local freqmove = math.random(15,40)/10
   --local timermove = 0
   --local wall = {
@@ -23,7 +24,7 @@ function enemy.new(x, y)
 
   local physics = bf.Collider.new(world, 'Circle', x, y, radius)
   physics:setLinearDamping(1)
-  physics:setRestitution(1)
+  physics:setRestitution(rest)
   physics.identity = 'enemy'
 
   function self.getX()
@@ -60,8 +61,8 @@ function enemy.new(x, y)
     if lit == 0  then
       
       local a = getAngle(self:getX(), self:getY(), plant.getX(), plant.getY())
-      local xbounce = math.cos(a) * pow * dt
-      local ybounce = math.sin(a) * pow * dt
+      local xbounce = math.cos(a) * pow
+      local ybounce = math.sin(a) * pow
       physics:applyForce(xbounce,ybounce)
       --lighter:updatePolygon(light, self:getX(), self:getY())
       --poly = 
@@ -86,7 +87,10 @@ function enemy.new(x, y)
       physics:setLinearDamping(1.2) 
       hit = 0
     end
-
+    if rest < 2 then
+      rest = rest + dt
+    end
+    physics:setRestitution(rest)
     table.insert(particles, particles.new(
         physics.getX(),physics.getY(),physics.getRadius()-1,
         'blue', 1, 1, 0,0))
@@ -94,8 +98,10 @@ function enemy.new(x, y)
 
   function physics:postSolve(other)
     if other.identity == 'player' then
+      --sounds.hit:play()
       if trap > 0 then
         --self:kill()
+
         hit = 1
         --dead = true
       else
@@ -111,6 +117,7 @@ function enemy.new(x, y)
         dead = true
       end
     end
+    rest = rest - 0.2
   end
 
   function physics:draw(alpha)

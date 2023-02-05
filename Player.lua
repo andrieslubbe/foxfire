@@ -56,6 +56,7 @@ function player.new(x, y, r)
 
   function self.still(dt)
     physics:setLinearDamping(10)
+    sounds.light:play()
     if lightrad < maxLight then
       lightrad = lightrad + dt * lightgrow
     end
@@ -77,6 +78,7 @@ function player.new(x, y, r)
   end
 
   function self.moving(dt)
+    sounds.light:stop()
     spawnTimer = spawnTimer - dt
     if spawnTimer <= 0 then
       if spores > 0 then 
@@ -142,13 +144,13 @@ function player.new(x, y, r)
    
       if love.keyboard.isDown("w") or love.keyboard.isDown("up") then
         table.insert(moveAngles, math.pi * 1.5)
-        if love.keyboard.isDown("s") or love.keyboard.isDown("right") then
+        if love.keyboard.isDown("d") or love.keyboard.isDown("right") then
           table.insert(moveAngles,math.pi*2)
         end
-      elseif love.keyboard.isDown("s") or love.keyboard.isDown("right") then
+      elseif love.keyboard.isDown("d") or love.keyboard.isDown("right") then
         table.insert(moveAngles,0)
       end
-      if love.keyboard.isDown("r") or love.keyboard.isDown("down") then
+      if love.keyboard.isDown("s") or love.keyboard.isDown("down") then
         table.insert(moveAngles,math.pi / 2)
       end
       if love.keyboard.isDown("a")  or love.keyboard.isDown("left") then
