@@ -21,8 +21,8 @@ lighter = Lighter()
 local fontL = love.graphics.newFont(48)
 local font = love.graphics.newFont(16)
 local fontS = love.graphics.newFont(10)
-gameWidth, gameHeight = 960, 540
-screenWidth, screenHeight = 1920, 1080
+gameWidth, gameHeight = 640, 400
+screenWidth, screenHeight =  1280, 800
 
 --spriteflower, animflower, gflower
 spriteflower = love.graphics.newImage("assets/images/flower-Sheet.png")
@@ -30,7 +30,7 @@ spriteflower = love.graphics.newImage("assets/images/flower-Sheet.png")
   
 local score
 local pillarcount
-local timelimit = 300
+local timelimit = 200
 local timetaken
 
 pal = {
@@ -66,7 +66,7 @@ end
 
 function love.load()
   timetaken = 0
-  pillarcount = 80
+  pillarcount = 40
   pause = true
   score = 0
 
@@ -111,7 +111,7 @@ function love.load()
   --}
 --
   --lighter:addPolygon(wall)
-  freqenemy = 1
+  freqenemy = 7
   timerenemy= freqenemy
   --local lightX, lightY = 500R, 500
 
@@ -139,15 +139,15 @@ function love.gamepadpressed(joystick, button)
   if button == 'start' then
       --print("pause")
       pause = not pause
-  elseif button =='x' then
-    love.event.quit("restart")
+  --elseif button =='x' then
+  --  love.event.quit("restart")
   end
 end
 
 function love.keypressed(key, scancode, isrepeat)
-  if key == "escape" then
-    love.event.quit("restart")
-  end
+  --if key == "escape" then
+  --  love.event.quit("restart")
+  --end
   if key == "space" then
     pause = not pause
   end
@@ -426,6 +426,7 @@ function love.draw()
   --  ammo = ammo .. '•'
   --end
   
+  -- Progress indicator
   local progress = ''
   for i=1,#pillar  do
     progress = progress .. '|'
@@ -439,8 +440,9 @@ function love.draw()
   --love.graphics.printf(ammo, 0, gameHeight/16, gameWidth, 'center')
   --love.graphics.setFont(fontS)
   --love.graphics.printf(score, 0, gameHeight/16-10, gameWidth, 'center')
-  love.graphics.printf(progress, 0, gameHeight/16*15+10, gameWidth, 'center')
+  love.graphics.printf(progress, 0, gameHeight-22, gameWidth, 'center')
 
+  --Time remaining
   local timestring = ''
   for i=1,math.ceil(timetaken)  do
     timestring = timestring .. '\\'
@@ -450,13 +452,13 @@ function love.draw()
   end
   love.graphics.setFont(fontS)
   love.graphics.setColor(pal.white)
-  love.graphics.printf(timestring, 0, gameHeight/16-30, gameWidth, 'center')
+  love.graphics.printf(timestring, 0, 2, gameWidth, 'center')
   
  -- 
   --animation:draw(sprite, plant:getX()-plant:getRadius(),plant:getY()-plant:getRadius())
   
   push:finish()
-  love.graphics.draw(img_hourglass,screenWidth-54,13)
+  love.graphics.draw(img_hourglass,screenWidth-36,10)
   --love.graphics.print(love.timer.getFPS( ),10,10)
   if pause then
     drawMenu()
@@ -481,6 +483,7 @@ function drawMenu()
   love.graphics.setFont(fontL)
   love.graphics.printf("| |", 0, screenHeight/4 , screenWidth, 'center')
   --love.graphics.printf("ESC", 0, screenHeight/4 , screenWidth, 'center')
+  -- Spacebar prompt
   love.graphics.setFont(fontS)
   love.graphics.printf("|____________|", 0, screenHeight/5*4 , screenWidth, 'center')
 end

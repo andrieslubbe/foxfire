@@ -60,9 +60,11 @@ function enemy.new(x, y)
     --  
     --end
     if lit > 0  then
-      physics:setLinearDamping(10)
+      --physics:setLinearDamping(10)
+      pow = 0.5
     else
-      physics:setLinearDamping(1)
+      --physics:setLinearDamping(1)
+      pow = 4
     end
       local a = getAngle(self:getX(), self:getY(), plant.getX(), plant.getY())
       local xbounce = math.cos(a) * pow
@@ -78,17 +80,20 @@ function enemy.new(x, y)
     --end
 
     if trap > 0 then
+      --physics:setLinearDamping(10)
       trap = trap - dt
       if trap < 0 then
         trap = 0
       end
+    else
+      
     end 
     if hit > 0 then
       physics:setLinearDamping(0.05)
       hit = hit - dt
     end 
     if hit < 0 then 
-      physics:setLinearDamping(1.2) 
+      physics:setLinearDamping(1) 
       hit = 0
     end
     if rest < restmax then
@@ -119,12 +124,18 @@ function enemy.new(x, y)
         other.dead = true
         dead = true
       end
+      if rest > 0.8 then
+        rest = rest - 0.2
+      end
     elseif other.identity == 'wall' then
       if hit > 0 then
         dead = true
       end
+      if rest > 0.8 then
+        rest = rest - 0.2
+      end
     end
-    rest = rest - 0.2
+    
   end
 
   function physics:draw(alpha)
